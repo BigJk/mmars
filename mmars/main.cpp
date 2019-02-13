@@ -1,7 +1,7 @@
 #include <fstream>
 #include <chrono>
 
-#include "core.hpp"
+#include "mmars.hpp"
 #include "parser.hpp"
 #include "cli11.hpp"
 

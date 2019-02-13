@@ -117,13 +117,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="core.cpp" />
+    <ClCompile Include="mmars.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cli11.hpp" />
-    <ClInclude Include="core.hpp" />
+    <ClInclude Include="mmars.hpp" />
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="warrior.hpp" />
