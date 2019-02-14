@@ -117,15 +117,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="benchmark.cpp" />
     <ClCompile Include="mmars.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="benchmark.hpp" />
     <ClInclude Include="cli11.hpp" />
     <ClInclude Include="mmars.hpp" />
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="parser.hpp" />
+    <ClInclude Include="thread_pool.hpp" />
     <ClInclude Include="warrior.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

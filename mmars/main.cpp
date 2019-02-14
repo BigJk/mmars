@@ -4,6 +4,7 @@
 #include "mmars.hpp"
 #include "parser.hpp"
 #include "cli11.hpp"
+#include "benchmark.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -41,6 +42,11 @@ int main(int argc, char *argv[])
     app.add_option("--rl,--read_limit", read_limit, "Read limit (defaults to core size)");
     app.add_option("--wl,--write_limit", write_limit, "Write limit (defaults to core size)");
 
+    int benchmark_threads = std::max(1, (int)std::thread::hardware_concurrency());
+    std::string benchmark_path = "";
+    app.add_option("-b,--b,--bench_path", benchmark_path, "The path to a folder that contains the warriors to benchmark against");
+    app.add_option("-t,--t,--bench_threads", benchmark_threads, "The amount of threads to use for the benchmark");
+
     try {
         app.parse(argc, argv);
     }
@@ -54,18 +60,11 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    /*
-     * Create Mars
-     */
-    mmars m(core_size, max_cycles, max_process, max_length, min_separation);
-    if (read_limit > 0) m.read_limit = read_limit;
-    if (write_limit > 0) m.write_limit = write_limit;
-
-    /*
-     * Seed
-     */
-    if (initial_pos > 0) m.set_seed(initial_pos - min_separation);
-    else m.set_seed(time(nullptr));
+    if(!benchmark_path.empty() && warrior_paths.size() > 1)
+    {
+        printf("You can only benchmark one warrior. Please try again with one warrior path!");
+        return 0;
+    }
 
     /*
      * Parse Warrior
@@ -80,12 +79,50 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        auto w = parser::parse(f, m.core_size);
-        m.add_warrior(w);
+        auto w = parser::parse(f, core_size);
         parsed.push_back(w);
 
         f.close();
     }
+
+    /*
+     * Benchmark
+     */
+    if (!benchmark_path.empty())
+    {
+        benchmark b(core_size, max_cycles, max_process, max_length, min_separation, read_limit, write_limit, rounds, benchmark_threads);
+        b.add_directory(benchmark_path);
+
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        float res = std::any_cast<float>(b.run(parsed[0]));
+        int64_t time_taken = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
+
+        b.shutdown();
+
+        if (parsed[0]->name.empty()) printf("Warrior=%-20d score=%.03f\n", i, res);
+        else printf("Warrior=%-20s score=%.03f\n", parsed[0]->name.c_str(), res);
+        printf("Finished in %lldms (%.2fms/round)", time_taken, (float)time_taken / (float)(rounds * b.warriors.size()));
+
+        return 0;
+    }
+
+    /*
+     * Create Mars
+     */
+    mmars m(core_size, max_cycles, max_process, max_length, min_separation);
+    if (read_limit > 0) m.read_limit = read_limit;
+    if (write_limit > 0) m.write_limit = write_limit;
+
+    for (auto && w : parsed)
+    {
+        m.add_warrior(w);
+    }
+
+    /*
+     * Seed
+     */
+    if (initial_pos > 0) m.set_seed(initial_pos - min_separation);
+    else m.set_seed((uint32_t)time(nullptr));
 
     /*
      * Simulate
