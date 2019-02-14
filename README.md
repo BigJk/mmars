@@ -12,6 +12,11 @@
 
 **Note:** P-Space is not yet implemented.
 
+## Features
+- Simple and clean MARS implementation
+- Load file parser
+- Multi-Threaded benchmark implementation
+
 ## CLI
 
 ```
@@ -21,7 +26,7 @@
  _/_/ /_/ /_/_/ /_/ /_/\__,_/_/  /____/  by BigJk
 
 mmars - c++ modern mars
-Usage: C:\Users\Nudl\source\repos\mmars\Release\mmars.exe [OPTIONS]
+Usage: C:\...\mmars.exe [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
@@ -35,6 +40,8 @@ Options:
   -f,--f,--fixed_pos INT      Fixed position for the first round (will also be used as seed)
   --rl,--read_limit INT       Read limit (defaults to core size)
   --wl,--write_limit INT      Write limit (defaults to core size)
+  -b,--b,--bench_path TEXT    The path to a folder that contains the warriors to benchmark against
+  -t,--t,--bench_threads INT  The amount of threads to use for the benchmark
 ```
 
 ## Credits & Reference
