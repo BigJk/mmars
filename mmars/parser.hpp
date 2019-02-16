@@ -213,7 +213,7 @@ public:
     }
 };
 
-class full_parser
+class parser
 {
 private:
     std::unordered_map<std::string, op_code> str_opcodes = {
@@ -308,7 +308,7 @@ public:
     uint32_t read_limit = 8000;
     uint32_t write_limit = 8000;
 
-    full_parser(uint32_t core_size, uint32_t max_cycles, uint32_t max_process, uint32_t max_length,
+    parser(uint32_t core_size, uint32_t max_cycles, uint32_t max_process, uint32_t max_length,
         uint32_t min_separation)
         : _line(0),
           _position(0),

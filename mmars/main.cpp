@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     /*
      * Parse Warrior
      */
-    full_parser p(core_size, max_cycles, max_process, max_length, min_separation);
+    parser p(core_size, max_cycles, max_process, max_length, min_separation);
     std::vector<std::shared_ptr<warrior>> parsed;
     for (auto && path : warrior_paths)
     {

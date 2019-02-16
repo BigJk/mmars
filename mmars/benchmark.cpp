@@ -9,7 +9,7 @@ void benchmark::add_warrior(const std::shared_ptr<warrior>& w)
 
 void benchmark::add_directory(const std::string& path)
 {
-    full_parser p(core_size, max_cycles, max_process, max_length, min_separation);
+    parser p(core_size, max_cycles, max_process, max_length, min_separation);
 
     for (const auto & entry : fs::directory_iterator(path))
     {

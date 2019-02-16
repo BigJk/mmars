@@ -4,12 +4,12 @@
 
 #include "parser.hpp"
 
-void full_parser::throw_error(int line, int pos, const std::string& message) const
+void parser::throw_error(int line, int pos, const std::string& message) const
 {
     throw std::exception(("[" + std::to_string(line) + ":" + std::to_string(pos) + "] " + message).c_str());
 }
 
-modifier full_parser::default_modifier(op_code op, addr_mode a_mode, addr_mode b_mode)
+modifier parser::default_modifier(op_code op, addr_mode a_mode, addr_mode b_mode)
 {
     switch (op)
     {
@@ -47,7 +47,7 @@ modifier full_parser::default_modifier(op_code op, addr_mode a_mode, addr_mode b
     return b;
 }
 
-void full_parser::transform_token(token_type t, std::string text)
+void parser::transform_token(token_type t, std::string text)
 {
     if(t == token_type::opcode || t == token_type::modifier || t == token_type::preprocessor)
         std::transform(text.begin(), text.end(), text.begin(), ::toupper);
@@ -64,12 +64,12 @@ void full_parser::transform_token(token_type t, std::string text)
     add_token(t, text);
 }
 
-void full_parser::add_token(token_type t, std::string text)
+void parser::add_token(token_type t, std::string text)
 {
     _tokens.emplace_back(_line, _position, text, t);
 }
 
-void full_parser::accumulator(std::string text)
+void parser::accumulator(std::string text)
 {
     auto match_token = [&](token_type t, std::regex pattern)
     {
@@ -120,19 +120,19 @@ void full_parser::accumulator(std::string text)
     }
 }
 
-void full_parser::comment(std::string text)
+void parser::comment(std::string text)
 {
     if(text.find("author") == 0 || text.find("AUTHOR") == 0) _result->author = text.substr(7);
     else if (text.find("name") == 0 || text.find("NAME") == 0)  _result->name = text.substr(5);
     add_token(token_type::comment, text);
 }
 
-void full_parser::eol()
+void parser::eol()
 {
     add_token(token_type::eol, "\n");
 }
 
-void full_parser::tokenize(std::istream& input)
+void parser::tokenize(std::istream& input)
 {
     std::string accum;
     std::string line;
@@ -182,7 +182,7 @@ void full_parser::tokenize(std::istream& input)
     }
 }
 
-void full_parser::filter()
+void parser::filter()
 {
     for (uint32_t i = 0; i < _tokens.size(); ++i)
     {
@@ -220,7 +220,7 @@ void full_parser::filter()
     }
 }
 
-void full_parser::process_equs()
+void parser::process_equs()
 {
     int current_pos = 0;
     std::vector<token> current_line = read_line(current_pos);
@@ -271,7 +271,7 @@ void full_parser::process_equs()
     }
 }
 
-void full_parser::process_org()
+void parser::process_org()
 {
     int current_pos = 0;
     std::vector<token> current_line = read_line(current_pos);
@@ -299,7 +299,7 @@ void full_parser::process_org()
     }
 }
 
-void full_parser::process_labels()
+void parser::process_labels()
 {
     int current_line = 0;
     for (uint32_t i = 0; i < _tokens.size() - 1; ++i)
@@ -340,7 +340,7 @@ void full_parser::process_labels()
     }
 }
 
-void full_parser::process_expressions()
+void parser::process_expressions()
 {
     static auto wrap = [](int i, int max)
     {
@@ -418,7 +418,7 @@ void full_parser::process_expressions()
     }
 }
 
-std::vector<token> full_parser::read_line(uint32_t start)
+std::vector<token> parser::read_line(uint32_t start)
 {
     if (start >= _tokens.size()) return {};
     std::vector<token> line;
@@ -429,14 +429,14 @@ std::vector<token> full_parser::read_line(uint32_t start)
     return line;
 }
 
-void full_parser::pop(uint32_t start, uint32_t size)
+void parser::pop(uint32_t start, uint32_t size)
 {
     if (start >= _tokens.size()) return;
     if (start + size >= _tokens.size()) size = _tokens.size() - start;
     _tokens.erase(_tokens.begin() + start, _tokens.begin() + start + size);
 }
 
-std::shared_ptr<warrior> full_parser::parse(std::istream& input)
+std::shared_ptr<warrior> parser::parse(std::istream& input)
 {
     _result = std::make_shared<warrior>();
     _position = 0;
