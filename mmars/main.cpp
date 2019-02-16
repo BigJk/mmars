@@ -11,15 +11,14 @@ int main(int argc, char *argv[])
     /*
      * CLI Setup
      */
-    CLI::App app{
-            "    _____ ___  ____ ___  ____ ___________\n"
+    CLI::App app{  "    _____ ___  ____ ___  ____ ___________\n"
                    "  __/ __ `__ \\/ __ `__ \\/ __ `/ ___/ ___/\n"
                    " __/ / / / / / / / / / / /_/ / /  (__  )\n"
                    " _/_/ /_/ /_/_/ /_/ /_/\\__,_/_/  /____/  by BigJk\n\n"
                    "mmars - c++ modern mars" };
 
     std::vector<std::string> warrior_paths;
-    app.add_option("-w,--w,--warrior", warrior_paths, "a list of warrior paths");
+    app.add_option("-w,--w,--warrior", warrior_paths, "A list of warrior paths");
 
     int core_size = 8000;
     int max_cycles = 80000;
@@ -69,6 +68,7 @@ int main(int argc, char *argv[])
     /*
      * Parse Warrior
      */
+    full_parser p(core_size, max_cycles, max_process, max_length, min_separation);
     std::vector<std::shared_ptr<warrior>> parsed;
     for (auto && path : warrior_paths)
     {
@@ -79,8 +79,16 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        auto w = parser::parse(f, core_size);
-        parsed.push_back(w);
+        try
+        {
+            auto w = p.parse(f);
+            parsed.push_back(w);
+        }
+        catch (std::exception ex)
+        {
+            printf("ERROR: (%s) %s\n", path.c_str(), ex.what());
+            return 0;
+        }
 
         f.close();
     }

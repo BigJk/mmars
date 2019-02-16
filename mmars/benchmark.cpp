@@ -9,6 +9,8 @@ void benchmark::add_warrior(const std::shared_ptr<warrior>& w)
 
 void benchmark::add_directory(const std::string& path)
 {
+    full_parser p(core_size, max_cycles, max_process, max_length, min_separation);
+
     for (const auto & entry : fs::directory_iterator(path))
     {
         try
@@ -16,14 +18,15 @@ void benchmark::add_directory(const std::string& path)
             std::fstream f(entry.path());
             if (!f || f.bad() || !f.is_open()) continue;
 
-            auto parsed = parser::parse(f, core_size);
+            auto parsed = p.parse(f);
             if (parsed != nullptr && parsed->code.size() <= max_length)
                 warriors.push_back(parsed);
 
             f.close();
         }
-        catch (...)
+        catch (std::exception ex)
         {
+            printf("ERROR: (%s) %s\n", entry.path().string().c_str(), ex.what());
         }
     }
 }

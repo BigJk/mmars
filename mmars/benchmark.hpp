@@ -41,7 +41,6 @@ public:
     std::function<std::any(result, int, int)> score_calc = [](result res, int rounds, int warriors)
     {
         return std::any(((float)res.win * 3.0f + (float)res.tie) / ((float)warriors * (float)rounds) * 100.0f);
- 
     };
 
     benchmark(uint32_t core_size, uint32_t max_cycles, uint32_t max_process, uint32_t max_length,
