@@ -14,8 +14,16 @@
 
 ## Features
 - Simple and clean MARS implementation
-- Load file parser
 - Multi-Threaded benchmark implementation
+- Redcode Parser
+    - Supported:
+        - equ
+        - labels
+        - ``+ - * / %``
+    - Unsupported:
+        - for / rof
+        - ``! == != < > <= >= && || =``
+        - predefined variables (CORESIZE, MAXPROCESSES ...)
 
 ## CLI
 
