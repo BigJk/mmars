@@ -211,12 +211,69 @@ void parser::filter()
                 {
                     if(_tokens[j].type == token_type::eol)
                     {
-                        _tokens.erase(_tokens.begin() + j + 1, _tokens.end());
+                        _tokens.erase(_tokens.begin() + j, _tokens.end());
                     }
                 }
             }
             break;
         }
+    }
+}
+
+void parser::process_for()
+{
+    bool in_for = false;
+    int for_start = 0;
+    int count = 0;
+    std::vector<token> scope;
+
+    int current_pos = 0;
+    std::vector<token> current_line = read_line(current_pos);
+    while (!current_line.empty())
+    {
+        for (uint32_t i = 0; i < current_line.size(); ++i)
+        {
+            if(in_for)
+            {
+                if(current_line[i].type == token_type::preprocessor && current_line[i].text == "ROF")
+                {
+                    in_for = false;
+                    pop(for_start, current_pos + 2 - for_start);
+                    for (int c = 0; c < count; ++c)
+                    {
+                        for (int j = scope.size() - 1; j >= 0; --j)
+                        {
+                            _tokens.insert(_tokens.begin() + for_start, scope[j]);
+                        }
+                    }
+                    for_start = 0;
+                    count = 0;
+                    scope.clear();
+                }
+                else
+                {
+                    scope.push_back(current_line[i]);
+                }
+            }
+            else if(current_line[i].type == token_type::preprocessor && current_line[i].text == "FOR")
+            {
+                if (in_for) throw_error(current_line[i].line, current_line[i].position, "invalid scope of for");
+
+                if(i+1 >= current_line.size()) throw_error(current_line[i].line, current_line[i].position, "missing for count");
+                if(current_line[i+1].type != token_type::number) throw_error(current_line[i].line, current_line[i].position, "for count is no number");
+
+                in_for = true;
+                count = std::atoi(current_line[i + 1].text.c_str());
+                for_start = current_pos + i;
+                i += 2;
+            }
+        }
+
+        if (in_for && !scope.empty() && scope[scope.size() - 1].type != token_type::eol)
+            scope.push_back(token(0, 0, "\n", token_type::eol));
+
+        current_pos += current_line.size() + 1;
+        current_line = read_line(current_pos);
     }
 }
 
@@ -444,9 +501,11 @@ std::shared_ptr<warrior> parser::parse(std::istream& input)
     _tokens.clear();
     _equs.clear();
     _labels.clear();
+    _org.clear();
 
     tokenize(input);
     for (int i = 0; i < 3; ++i) filter();
+    process_for();
     process_equs();
     process_org();
     process_labels();

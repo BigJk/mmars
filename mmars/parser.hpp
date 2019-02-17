@@ -267,7 +267,6 @@ private:
     std::regex _re_comma = std::regex(",", std::regex_constants::icase);
     std::regex _re_maths = std::regex("(\\+|\\-|\\*|\\/|%|\\(|\\))", std::regex_constants::icase);
     std::regex _re_comment = std::regex(";.*", std::regex_constants::icase);
-    std::regex _re_whitespace = std::regex("[ \\t]", std::regex_constants::icase);
 
     int _line;
     int _position;
@@ -290,6 +289,7 @@ private:
     void tokenize(std::istream& input);
     void filter();
 
+    void process_for();
     void process_equs();
     void process_org();
     void process_labels();
