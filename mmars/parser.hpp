@@ -1,13 +1,15 @@
 #pragma once
 
 #include <unordered_map>
-#include <cctype>
 #include <regex>
 #include <memory>
 #include <stack>
 
 #include "warrior.hpp"
 
+/**
+ * \brief The types a token can have
+ */
 enum class token_type
 {
     label,
@@ -23,6 +25,9 @@ enum class token_type
     unknown
 };
 
+/**
+ * \brief Token of a redcode token stream
+ */
 class token
 {
 public:
@@ -41,6 +46,9 @@ public:
     token() = default;
 };
 
+/**
+ * \brief Implementation of the shunting yard algorithm and evaluation of postfix formula
+ */
 class shunting_yard
 {
 private:
@@ -69,148 +77,7 @@ private:
 public:
     explicit shunting_yard() = default;
 
-    int eval(std::vector<token> expression)
-    {
-        if (expression.empty()) return 0;
-
-        if(expression[0].text == "+")
-        {
-            expression.erase(expression.begin(), expression.begin() + 1);
-        }
-
-        if (expression[0].text == "-")
-        {
-            expression.erase(expression.begin(), expression.begin() + 1);
-            expression[0].text = "-" + expression[0].text;
-        }
-
-        for (uint32_t i = 0; i < expression.size() - 1; ++i) // combine unary + / - into string
-        {
-            if(_operators.count(expression[i].text) && expression[i+1].text == "+")
-            {
-                expression.erase(expression.begin() + i + 1, expression.begin() + i + 2);
-            }
-            else if (_operators.count(expression[i].text) && expression[i + 1].text == "-")
-            {
-                expression.erase(expression.begin() + i + 1, expression.begin() + i + 2);
-                if(std::isdigit(expression[i + 1].text[0]))
-                {
-                    expression[i + 1].text = "-" + expression[i + 1].text;
-                }
-            }
-        }
-
-        std::stack<std::string>     stack;
-        std::vector<std::string>    postfix;
-
-        auto pop_op_stack = [&]()
-        {
-            std::string t = stack.top();
-            stack.pop();
-            return t;
-        };
-
-        for (auto && tok : expression)
-        {
-            if(tok.text == "(")
-            {
-                stack.push("(");
-            }
-            else if(tok.text == ")")
-            {
-                while(true)
-                {
-                    auto op = pop_op_stack();
-
-                    if (op == "(")
-                    {
-                        break;
-                    }
-
-                    postfix.push_back(op);
-                }
-            }
-            else
-            {
-                if(_operators.count(tok.text))
-                {
-                    while (!stack.empty())
-                    {
-                        if (!_operators.count(stack.top()) ||
-                            _operators[tok.text].precedence > _operators[stack.top()].precedence ||
-                            _operators[tok.text].precedence == _operators[stack.top()].precedence && _operators[tok.text].right_associative)
-                        {
-                            break;
-                        }
-
-                        postfix.push_back(pop_op_stack());
-                    }
-
-                    stack.push(tok.text);
-                }
-                else
-                {
-                    postfix.push_back(tok.text);
-                }
-            }
-        }
-
-        while(!stack.empty())
-        {
-            postfix.push_back(stack.top());
-            stack.pop();
-        }
-
-        std::stack<std::string> eval;
-        auto pop_eval_stack = [&]()
-        {
-            std::string t = eval.top();
-            eval.pop();
-            return t;
-        };
-
-        for (auto && i : postfix)
-        {
-            if (i == "*")
-            {
-                std::string v1 = pop_eval_stack();
-                std::string v2 = pop_eval_stack();
-                eval.push(std::to_string(std::atoi(v2.c_str()) * std::atoi(v1.c_str())));
-            }
-            else if (i == "/")
-            {
-                std::string v1 = pop_eval_stack();
-                std::string v2 = pop_eval_stack();
-                eval.push(std::to_string(std::atoi(v2.c_str()) / std::atoi(v1.c_str())));
-            }
-            else if (i == "%")
-            {
-                std::string v1 = pop_eval_stack();
-                std::string v2 = pop_eval_stack();
-                eval.push(std::to_string(std::atoi(v1.c_str()) % std::atoi(v2.c_str())));
-            }
-            else if (i == "-")
-            {
-                std::string v1 = pop_eval_stack();
-                std::string v2 = pop_eval_stack();
-                eval.push(std::to_string(std::atoi(v2.c_str()) - std::atoi(v1.c_str())));
-            }
-            else if (i == "+")
-            {
-                std::string v1 = pop_eval_stack();
-                std::string v2 = pop_eval_stack();
-                eval.push(std::to_string(std::atoi(v2.c_str()) + std::atoi(v1.c_str())));
-            }
-            else
-            {
-                eval.push(i);
-            }
-        }
-
-        if (eval.size() != 1) throw std::exception("expression evaluation failed");
-
-        return std::atoi(eval.top().c_str());
-    }
+    int eval(std::vector<token> expression);
 };
 
 class parser
