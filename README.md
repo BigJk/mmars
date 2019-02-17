@@ -10,7 +10,7 @@
 
 **M(odern)MARS** is yet another CoreWar simulator. It's goal is not to outperform other implementations. Instead it should be compact, clean and easily embeddable into other projects (evolvers etc.) without much hassle. All functions are commented and a simple CLI is provided to use mmars as standalone software.
 
-**Note:** P-Space is not yet implemented.
+**Note:** P-Space is not yet implemented and the parser definitly still contains bugs that prevent some warriors from assembling.
 
 ## Features
 - Simple and clean MARS implementation
@@ -19,9 +19,9 @@
     - Supported:
         - equ
         - labels
-        - ``+ - * / %``
+        - ``+ - * / %`` arithmetics
+        - simple ``for`` / ``rof`` with index, but without arithmetics in counter
     - Unsupported:
-        - for / rof
         - ``! == != < > <= >= && || =``
         - predefined variables (CORESIZE, MAXPROCESSES ...)
 
