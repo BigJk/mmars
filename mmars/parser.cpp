@@ -225,6 +225,7 @@ void parser::process_for()
     bool in_for = false;
     int for_start = 0;
     int count = 0;
+    std::string for_index;
     std::vector<token> scope;
 
     int current_pos = 0;
@@ -239,13 +240,20 @@ void parser::process_for()
                 {
                     in_for = false;
                     pop(for_start, current_pos + 2 - for_start);
-                    for (int c = 0; c < count; ++c)
+                    for (int c = count - 1; c >= 0; --c)
                     {
-                        for (int j = scope.size() - 1; j >= 0; --j)
+                        std::vector<token> c_line = scope;
+                        for (int j = c_line.size() - 1; j >= 0; --j)
                         {
-                            _tokens.insert(_tokens.begin() + for_start, scope[j]);
+                            if(c_line[j].type == token_type::label && c_line[j].text == for_index)
+                            {
+                                c_line[j].type = token_type::number;
+                                c_line[j].text = std::to_string(c + 1);
+                            }
+                            _tokens.insert(_tokens.begin() + for_start, c_line[j]);
                         }
                     }
+                    for_index = "";
                     for_start = 0;
                     count = 0;
                     scope.clear();
@@ -261,6 +269,8 @@ void parser::process_for()
 
                 if(i+1 >= current_line.size()) throw_error(current_line[i].line, current_line[i].position, "missing for count");
                 if(current_line[i+1].type != token_type::number) throw_error(current_line[i].line, current_line[i].position, "for count is no number");
+
+                if (i > 0 && current_line[i - 1].type == token_type::label) for_index = current_line[i - 1].text;
 
                 in_for = true;
                 count = std::atoi(current_line[i + 1].text.c_str());
