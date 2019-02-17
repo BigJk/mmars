@@ -5,6 +5,7 @@
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="mmars.cpp" />
     <ClCompile Include="benchmark.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="instruction.hpp" />
@@ -14,5 +15,6 @@
     <ClInclude Include="mmars.hpp" />
     <ClInclude Include="benchmark.hpp" />
     <ClInclude Include="thread_pool.hpp" />
+    <ClInclude Include="util.hpp" />
   </ItemGroup>
 </Project>

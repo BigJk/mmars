@@ -121,6 +121,7 @@
     <ClCompile Include="mmars.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="benchmark.hpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="thread_pool.hpp" />
+    <ClInclude Include="util.hpp" />
     <ClInclude Include="warrior.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

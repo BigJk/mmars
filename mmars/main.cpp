@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     int rounds = 100;
     int initial_pos = 0;
 
+    bool only_assemble = false;
+
     app.add_option("-s,--s,--core_size", core_size, "Core size");
     app.add_option("-c,--c,--max_cycle", max_cycles, "Maximum cycles");
     app.add_option("-p,--p,--max_process", max_process, "Maximum processes");
@@ -38,6 +40,7 @@ int main(int argc, char *argv[])
     app.add_option("-d,--d,--min_separation", min_separation, "Minimum separation");
     app.add_option("-r,--r,--rounds", rounds, "Rounds to fight");
     app.add_option("-f,--f,--fixed_pos", initial_pos, "Fixed position for the first round (will also be used as seed)");
+    app.add_option("-a,--asm,--assemble", only_assemble, "Just saves the assembled warriors");
     app.add_option("--rl,--read_limit", read_limit, "Read limit (defaults to core size)");
     app.add_option("--wl,--write_limit", write_limit, "Write limit (defaults to core size)");
 
@@ -83,6 +86,16 @@ int main(int argc, char *argv[])
         {
             auto w = p.parse(f);
             parsed.push_back(w);
+
+            if(only_assemble)
+            {
+                std::ofstream out(path + ".asm");
+                if (!out || !out.is_open() || out.bad())
+                    printf("ERROR: (%s) can't save assembled warrior\n", w->name.c_str());
+                else
+                    w->serialize(out);
+                out.close();
+            }
         }
         catch (std::exception ex)
         {
@@ -92,6 +105,8 @@ int main(int argc, char *argv[])
 
         f.close();
     }
+
+    if (only_assemble) return 0;
 
     /*
      * Benchmark
