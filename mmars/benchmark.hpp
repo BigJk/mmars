@@ -11,7 +11,11 @@
 #include "warrior.hpp"
 #include "mmars.hpp"
 
+#ifdef _MSC_VER
 namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
 
 /**
  * \brief Benchmarks a warrior against a set of other warriors. Also supports multi-threading if threads > 1.

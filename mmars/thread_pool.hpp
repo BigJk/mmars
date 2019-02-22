@@ -58,7 +58,7 @@ private:
                 // Work found
                 if (has_work)
                 {
-                    request._Myfirst._Val->set_value(request._Get_rest()._Myfirst._Val());
+                    std::get<0>(request)->set_value(std::get<1>(request)());
                 }
             }
 
@@ -87,7 +87,7 @@ public:
      */
     void shutdown()
     {
-        if (_should_stop) throw std::exception("thread pool is already closed");
+        if (_should_stop) throw std::runtime_error("thread pool is already closed");
 
         _should_stop = true;
         _cv.notify_all();
@@ -108,7 +108,7 @@ public:
      */
     std::future<T> enqueue_work(std::function<T()> func)
     {
-        if (_should_stop) throw std::exception("thread pool is already closed");
+        if (_should_stop) throw std::runtime_error("thread pool is already closed");
 
         auto promise = std::make_shared<std::promise<T>>();
 

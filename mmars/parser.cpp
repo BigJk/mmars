@@ -73,8 +73,7 @@ int shunting_yard::eval(std::vector<token> expression)
                 {
                     if (!_operators.count(stack.top()) ||
                         _operators[tok.text].precedence > _operators[stack.top()].precedence ||
-                        _operators[tok.text].precedence == _operators[stack.top()].precedence && _operators[tok.text].
-                        right_associative)
+                        (_operators[tok.text].precedence == _operators[stack.top()].precedence && _operators[tok.text].right_associative))
                     {
                         break;
                     }
@@ -143,14 +142,14 @@ int shunting_yard::eval(std::vector<token> expression)
         }
     }
 
-    if (eval.size() != 1) throw std::exception("expression evaluation failed");
+    if (eval.size() != 1) throw std::runtime_error("expression evaluation failed");
 
     return std::atoi(eval.top().c_str());
 }
 
 void parser::throw_error(int line, int pos, const std::string& message) const
 {
-    throw std::exception(("[" + std::to_string(line) + ":" + std::to_string(pos) + "] " + message).c_str());
+    throw std::runtime_error(("[" + std::to_string(line) + ":" + std::to_string(pos) + "] " + message).c_str());
 }
 
 modifier parser::default_modifier(op_code op, addr_mode a_mode, addr_mode b_mode)
@@ -337,7 +336,7 @@ void parser::filter()
             i--;
             break;
         case token_type::eol:
-            if(i == 0 || i + 1 < _tokens.size() && _tokens[i+1].type == token_type::eol)
+            if(i == 0 || (i + 1 < _tokens.size() && _tokens[i+1].type == token_type::eol))
             {
                 _tokens.erase(_tokens.begin() + i, _tokens.begin() + i + 1);
                 i--;
@@ -516,7 +515,7 @@ void parser::process_labels()
     for (uint32_t i = 0; i < _tokens.size() - 1; ++i)
     {
         if (_tokens[i].type == token_type::eol) current_line++;
-        if (_tokens[i].type != token_type::label || _tokens[i + 1].type != token_type::opcode && _tokens[i + 1].type != token_type::label) continue;
+        if (_tokens[i].type != token_type::label || (_tokens[i + 1].type != token_type::opcode && _tokens[i + 1].type != token_type::label)) continue;
         if (_equs.count(_tokens[i].text) || _labels.count(_tokens[i].text)) throw_error(_tokens[i].line, _tokens[i].position, _tokens[i].text + "> label redefinition");
         _labels.insert_or_assign(_tokens[i].text, current_line);
         _tokens.erase(_tokens.begin() + i, _tokens.begin() +  i + 1);

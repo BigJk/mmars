@@ -335,3 +335,5 @@ ASALocalRun/
 *.lib
 *.red
 *.rc
+
+*/cmake-*/*

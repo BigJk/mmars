@@ -40,7 +40,7 @@
           ; \
           break; \
        default: \
-          throw std::exception("unsupported operation"); \
+          throw std::runtime_error("unsupported operation"); \
        }; \
        queue(ri, (pc + 1) % core_size); \
        break;
@@ -85,7 +85,7 @@
              do_queue = false; \
           break; \
        default: \
-          throw std::exception("unsupported operation"); \
+          throw std::runtime_error("unsupported operation"); \
        }; \
        if(do_queue) queue(ri, (pc + 1) % core_size); \
        break;
@@ -172,7 +172,7 @@ void mmars::insert_warriors()
         if(failed)
         {
             // TODO: implement backup strategy
-            throw std::exception("couldn't position warriors");
+            throw std::runtime_error("couldn't position warriors");
         }
     }
 
@@ -192,8 +192,8 @@ void mmars::clear()
 
 void mmars::add_warrior(std::shared_ptr<warrior> w)
 {
-    if (w->code.empty()) throw std::exception("warrior has no code");
-    if (w->code.size() > max_length) throw std::exception("warrior code is too long");
+    if (w->code.empty()) throw std::runtime_error("warrior has no code");
+    if (w->code.size() > max_length) throw std::runtime_error("warrior code is too long");
 
     _warriors.push_back(w);
     _results.insert_or_assign(w, result());
@@ -203,7 +203,7 @@ result mmars::get_result(std::shared_ptr<warrior> w)
 {
     if(!_results.count(w))
     {
-        throw std::exception("warrior is not part of the mars");
+        throw std::runtime_error("warrior is not part of the mars");
     }
 
     result res = _results[w];
@@ -394,7 +394,7 @@ uint32_t mmars::step()
                 _core[(pc + wpb) % core_size] = ira;
                 break;
             default: 
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             queue(ri, (pc + 1) % core_size);
             break;
@@ -430,7 +430,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         case op_code::jmn:
@@ -453,7 +453,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         case op_code::djn:
@@ -488,7 +488,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         case op_code::sne:
@@ -528,7 +528,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         case op_code::cmp:
@@ -568,7 +568,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         case op_code::slt:
@@ -602,7 +602,7 @@ uint32_t mmars::step()
                 else queue(ri, (pc + 1) % core_size);
                 break;
             default:
-                throw std::exception("unsupported operation");
+                throw std::runtime_error("unsupported operation");
             }
             break;
         default: ;
@@ -661,13 +661,13 @@ std::vector<uint32_t> mmars::get_tasks(std::shared_ptr<warrior> w)
     {
         if(_warriors[i] == w)
         {
+            std::queue tmp = _task_queue[i];
             std::vector<uint32_t> res;
-            for (auto && q : _task_queue[i]._Get_container())
-            {
-                res.push_back(q);
+            while(!res.empty()) {
+                res.push_back(tmp.front());
+                tmp.pop();
             }
             return res;
         }
     }
-    throw std::exception("warrior not found");
 }
