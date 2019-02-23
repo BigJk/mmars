@@ -119,7 +119,7 @@ uint32_t mmars::copy_warrior(int wi, uint32_t p)
         _core[i + p] = w->code[i];
     }
     _task_queue[wi].push(p + w->start);
-    return p + w->code.size();
+    return p + (uint32_t)w->code.size();
 }
 
 void mmars::insert_warriors()
@@ -127,7 +127,7 @@ void mmars::insert_warriors()
     std::vector<uint32_t> target_positions = std::vector<uint32_t>(_warriors.size());
 
     if (_warriors.size() == 2) {
-        target_positions[1] = min_separation + _seed % (core_size + 1 - _warriors.size() * min_separation);
+        target_positions[1] = min_separation + _seed % (core_size + 1 - (uint32_t)_warriors.size() * min_separation);
         random();
     }
     else if(_warriors.size() > 2)
@@ -144,7 +144,7 @@ void mmars::insert_warriors()
             uint32_t i;
             for (i = 1; i < pos; ++i)
             {
-                uint32_t diff = std::abs((int)target_positions[pos] - (int)target_positions[i]);
+                uint32_t diff = (uint32_t)std::abs((int32_t)target_positions[pos] - (int32_t)target_positions[i]);
                 if (diff < min_separation)
                     break;
             }
@@ -234,10 +234,10 @@ void mmars::setup()
 
 uint32_t mmars::step()
 {
-    int alive = 0;
+    uint32_t alive = 0;
     for (uint32_t i = 0; i < _warriors.size(); ++i)
     {
-        int ri = (i + _round) % _warriors.size();
+        uint32_t ri = (i + _round) % (uint32_t)_warriors.size();
         if (_task_queue[ri].empty()) continue;
 
         /*
@@ -670,4 +670,5 @@ std::vector<uint32_t> mmars::get_tasks(std::shared_ptr<warrior> w)
             return res;
         }
     }
+    throw std::runtime_error("warrior not found");
 }
