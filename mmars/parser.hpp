@@ -172,9 +172,6 @@ public:
     uint32_t max_length = 200;
     uint32_t min_separation = 200;
 
-    uint32_t read_limit = 8000;
-    uint32_t write_limit = 8000;
-
     parser(uint32_t core_size, uint32_t max_cycles, uint32_t max_process, uint32_t max_length,
         uint32_t min_separation)
         : _line(0),
