@@ -15,5 +15,5 @@ install:
 before_script: cd mmars
 
 script:
-  - g++ main.cpp benchmark.cpp mmars.cpp parser.cpp util.cpp -std=c++17 -o mmars -lstdc++fs
+  - g++ main.cpp benchmark.cpp mmars.cpp parser.cpp util.cpp -std=c++17 -o mmars -lstdc++fs -pthread
   - ./mmars
