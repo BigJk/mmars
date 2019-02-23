@@ -12,6 +12,8 @@
 
 **Note:** P-Space is not yet implemented and the parser definitly still contains bugs that prevent some warriors from assembling.
 
+[![Build Status](https://travis-ci.com/BigJk/mmars.svg?branch=master)](https://travis-ci.com/BigJk/mmars)
+
 ## Features
 - Simple and clean MARS implementation
 - Multi-Threaded benchmark implementation
@@ -24,6 +26,11 @@
     - Unsupported:
         - ``! == != < > <= >= && || =``
         - predefined variables (CORESIZE, MAXPROCESSES ...)
+- Cross-Platform Compatible
+    - Mac OSX
+    - Linux
+    - Windows
+    - Browser via WebAssembly
 
 ## CLI
 
@@ -58,6 +65,7 @@ Options:
 - http://vyznev.net/corewar/guide.html
 - http://beej.us/pizza/koth/pmars.txt
 - http://www.corewar.co.uk/ankerl/exmars.htm
+- https://github.com/gareththegeek/corewar
 
 ## Used Libraries
 
