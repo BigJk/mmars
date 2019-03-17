@@ -90,20 +90,19 @@
        if(do_queue) queue(ri, (pc + 1) % core_size); \
        break;
 
-uint32_t mmars::fold(uint32_t ptr, uint32_t limit) const
+inline uint32_t mmars::fold(uint32_t ptr, uint32_t limit) const
 {
     uint32_t res = ptr % limit;
     if(res > (limit / 2)) res += core_size - limit;
     return res;
 }
 
-void mmars::queue(int wi, uint32_t ptr)
+inline void mmars::queue(int wi, uint32_t ptr)
 {
-    if (_task_queue[wi].size() >= max_process) return;
-    _task_queue[wi].push(ptr);
+    _task_queue[wi].enqueue(ptr);
 }
 
-int mmars::random()
+inline int mmars::random()
 {
     _seed = 16807 * (_seed % 127773) - 2836 * (_seed / 127773);
     if (_seed < 0)
@@ -118,7 +117,7 @@ uint32_t mmars::copy_warrior(int wi, uint32_t p)
     {
         _core[i + p] = w->code[i];
     }
-    _task_queue[wi].push(p + w->start);
+    _task_queue[wi].enqueue(p + w->start);
     return p + (uint32_t)w->code.size();
 }
 
@@ -223,11 +222,27 @@ void mmars::setup()
     {
         for (uint32_t i = 0; i < core_size; ++i)
         {
-            _core[i] = instruction();
+            _core[i].op = op_code::dat;
+            _core[i].mod = modifier::f;
+            _core[i].a_mode = addr_mode::dir;
+            _core[i].b_mode = addr_mode::dir;
+            _core[i].a = 0;
+            _core[i].b = 0;
         }
     }
 
-    _task_queue = std::vector<std::queue<uint32_t>>(_warriors.size(), std::queue<uint32_t>());
+    //_task_queue = std::vector<std::queue<uint32_t>>(_warriors.size(), std::queue<uint32_t>());
+    if(_task_queue.size() != _warriors.size())
+    {
+        _task_queue = std::vector<task_queue>(_warriors.size(), task_queue(max_process));
+    }
+    else
+    {
+        for (auto& i : _task_queue)
+        {
+            i.clear();
+        }
+    }
 
     insert_warriors();
 }
@@ -243,8 +258,7 @@ uint32_t mmars::step()
         /*
          * Get Current Task
          */
-        uint32_t pc = _task_queue[ri].front();
-        _task_queue[ri].pop();
+        uint32_t pc = _task_queue[ri].dequeue();
 
         uint32_t rpa, wpa, rpb, wpb, pip;
         instruction ir = _core[pc];
@@ -661,11 +675,10 @@ std::vector<uint32_t> mmars::get_tasks(std::shared_ptr<warrior> w)
     {
         if(_warriors[i] == w)
         {
-            std::queue tmp = _task_queue[i];
-            std::vector<uint32_t> res;
-            while(!res.empty()) {
-                res.push_back(tmp.front());
-                tmp.pop();
+            std::vector<uint32_t> res = std::vector<uint32_t>(_task_queue[i].count());
+            for (uint32_t j = 0; j < _task_queue[i].count(); ++j)
+            {
+                res.push_back(_task_queue[i].peek(j));
             }
             return res;
         }

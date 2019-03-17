@@ -41,11 +41,11 @@ enum addr_mode : char {
 class instruction
 {
 public:
+    addr_mode   a_mode;
+    addr_mode   b_mode;
     op_code     op;
     modifier    mod;
-    addr_mode   a_mode;
     uint32_t    a;
-    addr_mode   b_mode;
     uint32_t    b;
 
     instruction(op_code op, modifier mod, addr_mode a_mode, uint32_t a, addr_mode b_mode, uint32_t b)

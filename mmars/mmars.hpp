@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "warrior.hpp"
+#include "task_queue.hpp"
 
 /**
  * \brief Represents a fighting result
@@ -37,7 +38,7 @@ private:
     uint16_t                                                _round = 0;
     std::vector<std::shared_ptr<warrior>>                   _warriors;
     std::unordered_map<std::shared_ptr<warrior>, result>    _results;
-    std::vector<std::queue<uint32_t>>                       _task_queue;
+    std::vector<task_queue>                                 _task_queue;
     std::vector<instruction>                                _core;
 
 
