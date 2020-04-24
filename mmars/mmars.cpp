@@ -14,7 +14,7 @@
           break; \
        case modifier::ab: \
           _core[(pc + wpb) % core_size].b = \
-             (irb.a op ira.b) % core_size \
+             (irb.b op ira.a) % core_size \
           ; \
           break; \
        case modifier::ba: \
